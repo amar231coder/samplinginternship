@@ -1,0 +1,86 @@
+#  code to sample 3d files:
+
+import vtkmodules.all as vtk
+import numpy as np
+import matplotlib.pyplot as plt
+import argparse
+
+def load_obj(file_path):
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(file_path)
+    reader.Update()
+    return reader.GetOutput()
+
+def sample_points_from_vertices(polydata):
+    points = []
+
+    for i in range(polydata.GetNumberOfPoints()):
+        point = polydata.GetPoint(i)
+        if point:
+            points.append(point)
+
+    return points
+
+def plot_points_3d(points):
+    fig = plt.figure()
+    ax = fig.add_subplot(122,projection='3d')
+    if points:
+        x, y, z = zip(*points)
+        ax.scatter(x, y, z, marker='o')
+        ax.set_xlabel('X-axis')
+        ax.set_ylabel('Y-axis')
+        ax.set_zlabel('Z-axis')
+        ax.set_title('Sampling Points from 3D Model Vertices')
+        plt.show()
+    else:
+        print("No valid points to plot.")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Sample points from the vertices of a 3D model in an OBJ file.")
+    parser.add_argument("file_path", type=str, help="Path to the OBJ file")
+
+    args = parser.parse_args()
+    obj_file_path = args.file_path
+
+    try:
+        polydata = load_obj(obj_file_path)
+        sampled_points_3d = sample_points_from_vertices(polydata)
+        plot_points_3d(sampled_points_3d)
+    except FileNotFoundError:
+        print(f"File not found: {obj_file_path}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+
+
+# // code to sample 2d files:
+import matplotlib.pyplot as plt
+
+
+square_width = 5
+square_height = 5
+
+
+
+spacing = 1
+
+x_coordinates = []
+y_coordinates = []
+
+
+for x in range(0, square_width+1, spacing):
+    for y in range(0, square_height+1, spacing):
+        x_coordinates.append(x)
+        y_coordinates.append(y)
+
+# Plot the sampled points
+plt.scatter(x_coordinates, y_coordinates, marker='o', color='blue')
+plt.xlim(0, square_width)
+plt.ylim(0, square_height)
+plt.gca().set_aspect('equal', adjustable='box')
+plt.title("Regular Sampling of a Square")
+plt.xlabel("X-coordinate")
+plt.ylabel("Y-coordinate")
+plt.grid(True)
+plt.show()
